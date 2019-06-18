@@ -11,6 +11,10 @@ ____
 
 ### Manual de uso
 
+#### Acesso ao App
+O App é executado na porta **8080**. \
+URL: `http://localhost:8080/`
+
 #### Selecionar Estado de Conservação
 O botão **Selecionar**, abre o popup para seleção do **estado de conservação**.
 Para selecionar um estado no popup, clicar sobre o mesmo.
