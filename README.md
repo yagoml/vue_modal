@@ -4,7 +4,7 @@
 ____
 
 ### Instalar e Executar
-Instalar dependências: comando `npm i`
+Instalar dependências: comando `npm i` \
 Executar projeto: comando `npm run dev` ou executar o script `start.sh`
 
 ____
