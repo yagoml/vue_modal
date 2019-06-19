@@ -1,9 +1,6 @@
 <template>
 	<div class="window-popup" v-bind:style="visible">
-		<div 
-			id="windowContainer"
-			v-bind:style="windowWidth"
-		>
+		<div id="windowContainer" v-bind:style="windowWidth">
 			<img src="/src/images/_2420899821792@2x.png" class="closeWindow" @click="close">
 			<div id="windowTitle">{{ title }}</div>
 			<div id="windowContent">
@@ -55,7 +52,7 @@
 			}
 		},
 		created() {
-
+			
 		},
 		data() {
 			return {

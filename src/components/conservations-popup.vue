@@ -2,7 +2,7 @@
 	<window-popup
 		ref="windowPop"
 		@windowAction="windowAction"
-		@orderCancel="orderCancel()"
+		@windowCancel="windowCancel"
 		width="540px"
 		:title="popupTitle"
 		:buttonsTexts="{ close: 'Cancelar', action: 'Salvar' }"
@@ -13,10 +13,10 @@
 				<input
 					type="text"
 					placeholder="Search here..."
-					v-on:keyup="search"
-					v-model="searchText"
 					class="form-control"
 					title="Search by number, code or description"
+					v-on:keyup="search"
+					v-model="searchText"
 				>
 			</div>
 
@@ -24,13 +24,13 @@
 				<li
 					v-for="cs in conservationStates"
 					v-bind:key="cs.id"
-					@click="select(cs.id)"
 					v-bind:class="{ selected: isSelected(cs.id) }"
+					@click="select(cs.id)"
 				>
-					<span>{{ cs.id }} - {{ cs.code }}</span> <span class="cs-desc">{{ cs.desc }}</span>
+					<span>{{ cs.id }} - {{ cs.code }}</span> <span class="cs-desc color-grey">{{ cs.desc }}</span>
 				</li>
 			</ul>
-			<div v-else style="padding: 0 32px;">
+			<div v-else style="padding: 0 32px;" class="color-grey">
 				Nenhum resultado encontrado.
 			</div>
 		</div>
@@ -44,14 +44,19 @@
 		components: {
 			WindowPopup
 		},
-		props: ['selectedID'],
+		props: {
+			selectedID: {
+				default: 0,
+				type: Number
+			}
+		},
 		created() {
 
 		},
 		data() {
 			return {
-				selectedConservationID: 0,
-				selectedConservation: null,
+				mutatedSelectedID: 0,
+				selected: null,
 				searchText: ''
 			}
 		},
@@ -59,47 +64,42 @@
 			open() {
 				this.$store.dispatch('load-conservation-states', {})
 				this.searchText = ''
+				this.mutatedSelectedID = this.selectedID
 				this.$refs.windowPop.open()
-
-				if(this.selectedID) {
-					this.selectedConservationID = this.selectedID
-				} else {
-					this.selectedConservationID = 0
-				}
 			},
 			windowAction() {
-				this.selectedConservation = this.conservationStates.find((cs) => {
-					return cs.id == this.selectedConservationID
+				this.selected = this.conservationStates.find((cs) => {
+					return cs.id == this.mutatedSelectedID
 				})
 
-				this.$emit('conservation-selected', this.selectedConservation)
-			},
-			orderCancel() {
-				
+				this.$emit('conservation-selected', this.selected)
 			},
 			search(event) {
+				this.$store.dispatch('load-conservation-states')
 				let text = event.target.value
 
-				this.$store.dispatch('load-conservation-states', {})
-
 				if(text.length) {
-					let conservationStates = this.conservationStates.filter((cs) => {
-						return cs.id == parseInt(text) || cs.code.toLowerCase().match(text.toLowerCase()) || cs.desc.toLowerCase().match(text.toLowerCase())
-					})
-
-					this.$store.commit('set-conservation-states', conservationStates)
+					this.$store.commit('set-conservation-states', this.filterConservations(text))
 				}
 			},
 			select(id) {
 				if(this.isSelected(id)) {
-					this.selectedConservationID = 0
+					this.mutatedSelectedID = 0
 				} else {
-					this.selectedConservationID = id
+					this.mutatedSelectedID = id
 				}
 			},
 			isSelected(id) {
-				return this.selectedConservationID == id
-			}
+				return this.mutatedSelectedID == id
+			},
+			filterConservations(key) {
+				return this.conservationStates.filter((cs) => {
+					return cs.id == parseInt(key) ||
+						cs.code.toLowerCase().match(key.toLowerCase()) ||
+						cs.desc.toLowerCase().match(key.toLowerCase())
+				})
+			},
+			windowCancel() {}
 		},
 		watch: {
 			conservationStates: (newValue, oldValue) => {
@@ -113,9 +113,6 @@
 			conservationStates: {
 				get: function () {
 					return this.$store.getters.conservationStates
-				},
-				set: function (newValue) {
-
 				}
 			}
 		}
