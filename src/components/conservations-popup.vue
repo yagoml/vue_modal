@@ -132,7 +132,7 @@
 			li {
 				cursor: pointer;
 				border-bottom: 1px solid #F5F5F5;
-				padding: 3px 0;
+				padding: 7px 0;
 
 				&.selected {
 					background:#eee;
